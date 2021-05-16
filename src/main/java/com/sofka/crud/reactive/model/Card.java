@@ -9,11 +9,21 @@ import java.time.LocalDate;
 public class Card {
 
     @Id
-    private Integer number;
+    private String number;
 
     private String title;
     private LocalDate date;
     private TypeCard type;
+
+    public boolean isValid(){
+        if (this.type.equals(TypeCard.MASTER_CARD)){
+            return this.number.startsWith("03");
+        }
+        if (this.type.equals(TypeCard.VISA)){
+            return this.number.startsWith("06");
+        }
+        return this.number.startsWith("12");
+    }
 
     public String getTitle() {
         return title;
@@ -31,11 +41,11 @@ public class Card {
         this.date = date;
     }
 
-    public Integer getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(Integer number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 

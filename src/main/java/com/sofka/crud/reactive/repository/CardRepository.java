@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface CardRepository extends ReactiveMongoRepository<Card,Integer> {
+public interface CardRepository extends ReactiveMongoRepository<Card,String> {
     public Flux<Card> findByType(TypeCard typeCard);
 }
