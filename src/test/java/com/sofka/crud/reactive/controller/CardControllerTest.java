@@ -6,6 +6,8 @@ import com.sofka.crud.reactive.repository.CardRepository;
 import com.sofka.crud.reactive.service.CardService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -37,6 +39,32 @@ class CardControllerTest {
 
     @MockBean
     private CardRepository repository;
+
+    @ParameterizedTest
+    @CsvSource({"0334444648384,pepe dusdso,1995-04-21,MASTER_CARD"})
+    void post(String  number,String title,LocalDate date,TypeCard type){
+
+        Mockito.when(repository.save(Mockito.any(Card.class)))
+                .thenReturn(Mono.just(new Card(number,title,date,type)));
+
+        var request = Mono.just(new Card(number,title,date,type));
+        webTestClient.post()
+                .uri("/card")
+                .body(request,Card.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().returnResult();
+    }
+
+    @Test
+    void delete(){
+        Mockito.when(repository.deleteById(Mockito.anyString())).thenReturn(Mono.empty());
+        webTestClient.delete()
+                .uri("/card/033445448384")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().isEmpty();
+    }
 
     @Test
     void get(){
