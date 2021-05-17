@@ -2,8 +2,10 @@ package com.sofka.crud.reactive.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Document(collection = "cards")
 public class Card {
@@ -14,6 +16,13 @@ public class Card {
     private String title;
     private LocalDate date;
     private TypeCard type;
+
+    public Card(String number, String title, LocalDate date, TypeCard type) {
+        this.number = number;
+        this.title = title;
+        this.date = date;
+        this.type = type;
+    }
 
     public boolean isValid(){
         if (this.type.equals(TypeCard.MASTER_CARD)){

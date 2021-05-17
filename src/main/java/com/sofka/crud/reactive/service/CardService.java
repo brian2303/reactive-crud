@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Service
 public class CardService {
 
@@ -25,11 +27,15 @@ public class CardService {
     public Mono<Card> save(Mono<Card> cardMono){
         return cardMono
                 .filter(Card::isValid)
-                .flatMap(card -> cardRepository.save(card));
+                .flatMap(cardRepository::save);
     }
 
     public Flux<Card> findByType(TypeCard typeCard){
         return cardRepository.findByType(typeCard);
+    }
+
+    public Mono<Void> delete(String id){
+        return cardRepository.deleteById(id).then();
     }
 
 }
