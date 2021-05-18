@@ -4,6 +4,7 @@ import com.sofka.crud.reactive.model.Card;
 import com.sofka.crud.reactive.model.TypeCard;
 import com.sofka.crud.reactive.repository.CardRepository;
 import com.sofka.crud.reactive.service.CardService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,6 +55,27 @@ class CardControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();
+        Mockito.verify(service).save(argumentCaptor.capture());
+        var card = argumentCaptor.getValue().block();
+        Assertions.assertEquals(number,card.getNumber());
+        Assertions.assertEquals(title,card.getTitle());
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({"0334444648384,pepe dusdso,1995-04-21,MASTER_CARD"})
+    void put(String  number,String title,LocalDate date,TypeCard type){
+
+        Mockito.when(repository.save(Mockito.any(Card.class)))
+                .thenReturn(Mono.just(new Card(number,title,date,type)));
+
+        var request = Mono.just(new Card(number,title,date,type));
+        webTestClient.put()
+                .uri("/card")
+                .body(request,Card.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().returnResult();
     }
 
     @Test
@@ -83,6 +105,25 @@ class CardControllerTest {
                 .jsonPath("$[1].number").isEqualTo("032435342");
         Mockito.verify(service).findAll();
         Mockito.verify(repository).findAll();
+    }
+
+    @Test
+    void getByType(){
+        var list = Flux.just(
+                new Card("031332323","card mc", LocalDate.now(), TypeCard.MASTER_CARD),
+                new Card("032435342","card mc", LocalDate.now(), TypeCard.MASTER_CARD)
+        );
+
+        Mockito.when(repository.findByType(Mockito.any(TypeCard.class))).thenReturn(list);
+        webTestClient.get()
+                .uri("/card/MASTER_CARD")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].number").isEqualTo("031332323")
+                .jsonPath("$[1].number").isEqualTo("032435342");
+        Mockito.verify(service).findByType(Mockito.any(TypeCard.class));
+        Mockito.verify(repository).findByType(Mockito.any(TypeCard.class));
     }
 
 
